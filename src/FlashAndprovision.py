@@ -14,7 +14,6 @@ def setupLogger(serial_number):
     log.setLevel(logging.INFO)
     formatter = logging.Formatter(fmt="%(asctime)s.%(msecs)03d %(levelname)s %(serial)s: %(message)s", datefmt='%Y-%m-%d-%H:%M:%S')
     
-
     #- sett loging level for std Out
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.INFO)
@@ -27,7 +26,6 @@ def setupLogger(serial_number):
     log.addHandler(ch)
     log.addHandler(fh)
     log = logging.LoggerAdapter(log, extra)
-
     return log
 
 
@@ -77,7 +75,7 @@ def rtt_command(jlink, command,log):
 
     log.debug("Desired response: \"%s\"", desiredResponse)
         
-    ##----------------- Read RTT and look for desired response
+    ##----------------- Read RTT and look for desired response --------------
     terminal_bytes=""
     status = False
     for i in range(1000):  # 10 second timeout
@@ -92,23 +90,25 @@ def rtt_command(jlink, command,log):
         if len(lines) > 2:                                               # Nr of lines is higher than 2
             if (lines[-1].find('rtt:~$') != -1):                         # Last line contains a prompt
                 if (lines[-2].find("rtt:~$") == -1):                     # Second last has no prompt
-                    if (re.search('[a-zA-Z]', lines[-2]) is not None):   # SEcond last Contains letters
+                    if (re.search('[a-zA-Z]', lines[-2]) is not None):   # Second last Contains letters
                         status = True
-        
-        if status: 
+        if status:
+            # We received a response
             response = lines[-2]
             log.debug("Rtt shell response when prompt found:%s",terminal_bytes)
+            
+            # Test if we received the correct response
             if terminal_bytes.find(desiredResponse) != -1:
-                # Received desired responce
                 log.info("RTT Response: \"%s\" Pass!", response)
+                status = True
             else:
-                log.info("RTT Response: \"%s\" fail", response)
-                log.error("Shell error response:%s", terminal_bytes)     
-            return response
+                log.error("RTT Response: \"%s\" fail!", response)
+                status = False     
+            break
         else:
             time.sleep(0.01)
-    else:
-        time.sleep(0.01)
+
+    return status
 
 def flashHex(jlink,hexFile,log):
     log.info("Erasing flash...")
@@ -130,6 +130,7 @@ def getJLinkSerials(jlink):
 def FLasAndConfig(serial_number, hexFile): #, log):
     log=setupLogger(serial_number)
     
+    log.info("connecting to JLink...")
     jlink = pylink.JLink()
     jlink.disable_dialog_boxes()                    # Try to quiet the popups
     #programmers=jlink.connected_emulators()         # List connected probes
@@ -143,7 +144,7 @@ def FLasAndConfig(serial_number, hexFile): #, log):
 
     # #----- Erase and flash hex file --------------
     flashHex(jlink,hexFile,log)
-    # # ---- Connect to RTT shell --- 
+    # # ---- Connect to RTT shell ------------------ 
     log.info("Starting RTT...")
     jlink.rtt_start()
     
@@ -164,11 +165,9 @@ def FLasAndConfig(serial_number, hexFile): #, log):
     rtt_command(jlink, "modem set psk grggg",log)
     rtt_command(jlink, "modem set psk ghwwh",log)
 
-
     rtt_command(jlink, "modem get psk",log)
     rtt_command(jlink, "modem set psk sderww",log)
     rtt_command(jlink, "modem get psk",log)
-
 
     jlink.rtt_stop()
     jlink.close()
@@ -179,5 +178,4 @@ if __name__ == "__main__":
     
     serial_number=sys.argv[1]
     hexFile=str(sys.argv[2])
-
     FLasAndConfig(serial_number, hexFile)
