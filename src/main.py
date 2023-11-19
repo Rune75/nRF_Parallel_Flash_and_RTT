@@ -15,6 +15,8 @@ def flashProcess(serialnumbers):
 
 #-- Get a list of connected JLinks serial numbers to run in parallel.
 jlinkSerialNumbers = fp.getJLinkSerials(pylink.JLink())    
+print("SerialNr: ", jlinkSerialNumbers)
+
 
 #- Execute Jlink programming and RTT configuration in parallel 
 with multiprocessing.Pool() as pool: 
