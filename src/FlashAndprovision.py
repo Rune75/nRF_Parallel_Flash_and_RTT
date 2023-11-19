@@ -29,30 +29,6 @@ def setupLogger(serial_number):
     return log
 
 
-def printRTTChannels(jlink,log):
-    """Prints RTT buffer and channel information.
-    """
-    
-    for i in range(100): # Try to read RTT for 100 ms before giving up
-        try:
-            num_up = jlink.rtt_get_num_up_buffers()
-            num_down = jlink.rtt_get_num_down_buffers()
-            log.info("RTT started, %d up bufs, %d down bufs. Waited! %dms", num_up, num_down, i)
-
-            log.info("up channels:")
-            for buf_index in range(jlink.rtt_get_num_up_buffers()):
-                buf = jlink.rtt_get_buf_descriptor(buf_index, True)
-                log.info("    %d: name = %r, size = %d bytes, flags = %d", buf.BufferIndex, buf.name, buf.SizeOfBuffer, buf.Flags)
-
-            log.info("down channels:")
-            for buf_index in range(jlink.rtt_get_num_down_buffers()):
-                buf = jlink.rtt_get_buf_descriptor(buf_index, False)
-                log.info("    %d: name = %r, size = %d bytes, flags = %d", buf.BufferIndex, buf.name, buf.SizeOfBuffer, buf.Flags)
-            break
-        except pylink.errors.JLinkRTTException:
-            time.sleep(0.001)
-
-
 def rtt_command(jlink, command,log):
     log.info("RTT Command: \"%s\"", command)
     try:
@@ -133,9 +109,6 @@ def FLasAndConfig(serial_number, hexFile): #, log):
     log.info("connecting to JLink...")
     jlink = pylink.JLink()
     jlink.disable_dialog_boxes()                    # Try to quiet the popups
-    #programmers=jlink.connected_emulators()         # List connected probes
-    #log.info("connected jlinks: %s", programmers)
-    log.info("connecting to JLink...")
     jlink.open(serial_number)
     
     log.info("connecting to device: %s..." % target_device)
@@ -147,9 +120,6 @@ def FLasAndConfig(serial_number, hexFile): #, log):
     # # ---- Connect to RTT shell ------------------ 
     log.info("Starting RTT...")
     jlink.rtt_start()
-    
-    #if log.isEnabledFor(logging.DEBUG):
-        #printRTTChannels(jlink)
 
     #---- Fill rtc buffer with junk to se iff we are able to empty it
     jlink.rtt_write(0, list(bytearray("help","utf-8") + b"\x0A\x00"))
