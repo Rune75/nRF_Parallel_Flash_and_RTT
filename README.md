@@ -7,6 +7,10 @@ The flashing stage will upload a minimal RTT shell application to the connected 
 pylink  
 SEGGER JLink
 
+### Usage connect the
+Connect nRF52840 devices to the computer trough multiple JLink USB adapters.
 #### Execute the Python example  
 cd src  
 ./main.py
+
+Combined log goes to stdOut, and device individual logs will go to separate files per JLink serial number.
