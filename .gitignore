@@ -1,0 +1,6 @@
+.venv
+mylog.log
+
+*.log
+__pycache__
+*experiments
