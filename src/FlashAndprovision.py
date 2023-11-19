@@ -117,7 +117,7 @@ def FLasAndConfig(serial_number, hexFile): #, log):
 
     # #----- Erase and flash hex file --------------
     flashHex(jlink,hexFile,log)
-    # # ---- Connect to RTT shell --- 
+    # # ---- Connect to RTT shell ------------------ 
     log.info("Starting RTT...")
     jlink.rtt_start()
 
@@ -135,11 +135,9 @@ def FLasAndConfig(serial_number, hexFile): #, log):
     rtt_command(jlink, "modem set psk grggg",log)
     rtt_command(jlink, "modem set psk ghwwh",log)
 
-
     rtt_command(jlink, "modem get psk",log)
     rtt_command(jlink, "modem set psk sderww",log)
     rtt_command(jlink, "modem get psk",log)
-
 
     jlink.rtt_stop()
     jlink.close()
