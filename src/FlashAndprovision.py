@@ -5,7 +5,6 @@ import sys
 import time
 import logging
 import re
-import multiprocessing 
 
 target_device='nRF52840_xxAA'
 
