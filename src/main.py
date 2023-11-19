@@ -3,8 +3,8 @@ import multiprocessing
 import pylink
 import FlashAndprovision as fp #Import Flash and config module
 
-#hexFile='./nRF_hexFiles/rttShell840.hex'
-hexFile='./nRF_hexFiles/rttShell833.hex'
+hexFile='./nRF_hexFiles/rttShell840.hex'
+#hexFile='./nRF_hexFiles/rttShell833.hex'
 
 def flashProcess(serialnumbers):
     fp.FLasAndConfig(serialnumbers,hexFile)
